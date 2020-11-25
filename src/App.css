@@ -1,4 +1,4 @@
-.App {
+/* .App {
   text-align: center;
 }
 
@@ -35,4 +35,38 @@
   to {
     transform: rotate(360deg);
   }
+} */
+
+* {
+  margin: 0;
+  padding: 0;
 }
+
+.App {
+  padding-top: 50px;
+}
+
+.visible-box {
+  margin: 0 auto;
+  position: relative;
+  height: 300px;
+  width: 200px;
+  overflow: hidden;
+  overflow-y: scroll;
+  background: lightgray;
+}
+
+.list-item {
+  width: 100%;
+  height: 30px;
+  line-height: 30px;
+  position: absolute;
+}
+
+.active {
+  background: lightcoral;
+}
+
+/* .full-list {
+  height: 1000px;
+} */
