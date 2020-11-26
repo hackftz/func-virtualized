@@ -30,7 +30,7 @@ function App() {
   /// 虚拟化列表为15个
 
   const reCalList = (params) => {
-    for (let i = startIndex; i < startIndex + 15; i++) {
+    for (let i = startIndex; i < endIndex + 1; i++) {
       // 样式item
       let styleItem = {};
       styleItem.top = i * 30;
@@ -49,11 +49,13 @@ function App() {
 
   return (
     <div className='App'>
-      <div className='visible-box'>
+      <div 
+        className='visible-box'
+        onScroll={fullListScroll}
+      >
         <ul
           className='full-list'
           style={{ height: fullListHeight + 'px' }}
-          onScroll={fullListScroll}
         >
           {list.map((item) => (
             <li
