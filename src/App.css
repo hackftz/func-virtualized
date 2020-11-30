@@ -42,7 +42,7 @@
   padding: 0;
 }
 
-.App {
+/* .App {
   padding-top: 50px;
 }
 
@@ -65,8 +65,18 @@
 
 .active {
   background: lightcoral;
-}
+} */
 
 /* .full-list {
   height: 1000px;
 } */
+
+
+html, body {
+  height: 100%;
+}
+
+.list-item {
+  border-bottom: 1px solid #eee;
+  padding-left: 10px;
+}
