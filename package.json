@@ -10,6 +10,7 @@
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.1",
     "react-tiny-virtual-list": "^2.2.0",
+    "single-spa-react": "^4.0.0",
     "web-vitals": "^0.2.4"
   },
   "scripts": {
