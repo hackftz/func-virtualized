@@ -1,151 +1,153 @@
-import './App.css'
+import './App.css';
 
-import React, { Component } from 'react'
-import Item from './Item'
+import React, { Component } from 'react';
+import Item from './Item';
 
-const height = 60
-const bufferSize = 5
+const height = 60;
+const bufferSize = 5;
 
 export default class VirtualizedList extends Component {
-  constructor (props) {
-    super(props)
+  constructor(props) {
+    super(props);
 
     this.state = {
       startOffset: 0,
       endOffset: 0,
-      visibleData: []
-    }
+      visibleData: [],
+    };
 
-    this.data = new Array(1000).fill(true)
+    this.data = new Array(200).fill(true);
 
-    this.startIndex = 0
-    this.endIndex = 0
-    this.scrollTop = 0
+    this.startIndex = 0;
+    this.endIndex = 0;
+    this.scrollTop = 0;
 
-    this.doc = null
+    this.doc = null;
 
     // 缓存已渲染元素的位置信息
-    this.cache = []
+    this.cache = [];
     // 缓存锚点元素的位置信息
     this.anchorItem = {
       index: 0, // 锚点元素的索引值
       top: 0, // 锚点元素的顶部距离第一个元素的顶部的偏移量(即 startOffset)
-      bottom: 0 // 锚点元素的底部距离第一个元素的顶部的偏移量
-    }
+      bottom: 0, // 锚点元素的底部距离第一个元素的顶部的偏移量
+    };
 
-    this.handleScroll = this.handleScroll.bind(this)
-    this.cachePosition = this.cachePosition.bind(this)
+    this.handleScroll = this.handleScroll.bind(this);
+    this.cachePosition = this.cachePosition.bind(this);
   }
-  
-  cachePosition (node, index) {
+
+  cachePosition(node, index) {
     // 每个item 挂载好后执行
-    const rect = node.getBoundingClientRect()
-    const top = rect.top + window.pageYOffset // 防止有其他滚动干扰 重新取值 || 0
-    const bottom = top + height
+    // const rect = node.getBoundingClientRect();
+    // const top = rect.top + window.pageYOffset; // 防止有其他滚动干扰 重新取值 || 0
+    const top = index * 60;
+    console.log('🚀 ~ file: App.js ~ line 44 ~ VirtualizedList ~ cachePosition ~ top', top);
+    const bottom = top + height;
 
     // 判断 缓存项已有的话则不存入
-    let flag = false
+    let flag = false;
 
     for (let i = 0; i < this.cache.length; i++) {
       const { index: oldIndex, top: oldTop, bottom: oldBottom } = this.cache[i];
       if (index === oldIndex && top === oldTop && bottom === oldBottom) {
-        flag = true
+        flag = true;
       }
     }
-    
+
     if (!flag) {
       this.cache.push({
         index,
         top,
-        bottom
-      })
+        bottom,
+      });
     }
   }
 
   // 滚动事件处理函数
-  handleScroll (e) {
-    if (!this.doc) {
-      // 兼容 iOS Safari/Webview
-      this.doc = window.document.body.scrollTop ? window.document.body : window.document.documentElement
-    }
+  handleScroll(e) {
+    // if (!this.doc) {
+    //   // 兼容 iOS Safari/Webview
+    //   this.doc = window.document.body.scrollTop ? window.document.body : window.document.documentElement;
+    // }
 
-    const scrollTop = this.doc.scrollTop
+    // const scrollTop = this.doc.scrollTop;
+
+    const scrollTop = document.getElementById('wrapper').scrollTop;
 
     // 判断滚动值的正负变化判断是向上滚动还是向下滚动 首次滚动会更新锚点对象
     if (scrollTop > this.scrollTop) {
       if (scrollTop > this.anchorItem.bottom) {
-        this.updateBoundaryIndex(scrollTop)
-        this.updateVisibleData()
+        this.updateBoundaryIndex(scrollTop);
+        this.updateVisibleData();
       }
     } else if (scrollTop < this.scrollTop) {
       if (scrollTop < this.anchorItem.top) {
-        this.updateBoundaryIndex(scrollTop)
-        this.updateVisibleData()
+        this.updateBoundaryIndex(scrollTop);
+        this.updateVisibleData();
       }
     }
 
-    this.scrollTop = scrollTop
+    this.scrollTop = scrollTop;
   }
 
   // 更新startIndex和endIndex
-  updateBoundaryIndex (scrollTop) {
-    scrollTop = scrollTop || 0
+  updateBoundaryIndex(scrollTop) {
+    scrollTop = scrollTop || 0;
     // 用户正常滚动下，根据 scrollTop 找到新的锚点元素位置
-    const anchorItem = this.cache.find(item => item.bottom >= scrollTop)
+    const anchorItem = this.cache.find(item => item.bottom >= scrollTop);
 
     if (!anchorItem) {
       // 滚的太快，找不到锚点元素，这个暂不处理
-      return
+      return;
     }
 
     this.anchorItem = {
-      ...anchorItem
-    }
+      ...anchorItem,
+    };
 
-    this.startIndex = this.anchorItem.index
-    this.endIndex = this.startIndex + this.visibleCount
+    this.startIndex = this.anchorItem.index;
+    this.endIndex = this.startIndex + this.visibleCount;
   }
 
   // 根据startIndex和endIndex 计算真实列表数据
-  updateVisibleData () {
-    const visibleData = this.data.slice(this.startIndex, this.endIndex)
+  updateVisibleData() {
+    const visibleData = this.data.slice(this.startIndex, this.endIndex);
 
     this.setState({
       startOffset: this.anchorItem.top,
       endOffset: (this.data.length - this.endIndex) * height,
-      visibleData
-    })
+      visibleData,
+    });
   }
 
-  componentDidMount () {
+  componentDidMount() {
     // 首次渲染
-    this.visibleCount = Math.ceil(window.innerHeight / height) + bufferSize
-    this.endIndex = this.startIndex + this.visibleCount
-    this.updateVisibleData()
+    this.visibleCount = Math.ceil(window.innerHeight / height) + bufferSize;
+    this.endIndex = this.startIndex + this.visibleCount;
+    this.updateVisibleData();
 
     // 添加滚动监听event
-    window.addEventListener('scroll', this.handleScroll, false)
+    document.getElementById('wrapper').addEventListener('scroll', this.handleScroll, false);
   }
 
-  render () {
-    const { startOffset, endOffset, visibleData } = this.state
+  render() {
+    const { startOffset, endOffset, visibleData } = this.state;
 
     return (
-      <div className='wrapper' ref={node => { this.wrapper = node }}>
+      <div
+        className="wrapper"
+        id="wrapper"
+        ref={node => {
+          this.wrapper = node;
+        }}
+      >
         <div style={{ paddingTop: `${startOffset}px`, paddingBottom: `${endOffset}px` }}>
-          {
-            visibleData.map((item, index) => {
-              return (
-                <Item
-                  cachePosition={this.cachePosition}
-                  key={this.startIndex + index}
-                  index={this.startIndex + index}
-                />
-              )
-            })
-          }
+          {visibleData.map((item, index) => {
+            return <Item cachePosition={this.cachePosition} key={this.startIndex + index} index={this.startIndex + index} />;
+          })}
         </div>
       </div>
-    )
+    );
   }
 }
